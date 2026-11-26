@@ -135,7 +135,7 @@ function actionLines(action: MobileAction, where: string): string[] {
       return action.clearState === undefined ? ["- launchApp"] : ["- launchApp:", `    clearState: ${action.clearState}`];
     case "tapOn":
     case "longPressOn":
-      return [`- ${action.kind}:`, ...selectorLines(action.target, where), ...(action.at === undefined ? [] : [`    point: ${quoted(action.at)}`)];
+      return [`- ${action.kind}:`, ...selectorLines(action.target, where), ...(action.at === undefined ? [] : [`    point: ${quoted(action.at)}`])];
     case "inputText":
       return [`- inputText: ${plainText(action.text, where)}`];
     case "eraseText":
