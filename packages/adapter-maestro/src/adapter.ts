@@ -93,6 +93,9 @@ export type MobileOracle = z.infer<typeof oracles>;
 
 export type MobileTrace = TypedTrace<MobileAction, MobileOracle>;
 
+/** The keys of a keyboard on an Android phone: Gboard, or the keyboard of the emulator. */
+const ANDROID_KEYBOARD = "com\\.(google\\.)?android\\.inputmethod\\.latin:id/.*";
+
 /** A YAML double-quoted string. JSON strings are valid YAML. */
 function quoted(value: string): string {
   return JSON.stringify(value);
@@ -132,7 +135,7 @@ function actionLines(action: MobileAction, where: string): string[] {
       return action.clearState === undefined ? ["- launchApp"] : ["- launchApp:", `    clearState: ${action.clearState}`];
     case "tapOn":
     case "longPressOn":
-      return [`- ${action.kind}:`, ...selectorLines(action.target, where), ...(action.at === undefined ? [] : [`    point: ${quoted(action.at)}`])];
+      return [`- ${action.kind}:`, ...selectorLines(action.target, where), ...(action.at === undefined ? [] : [`    point: ${quoted(action.at)}`)];
     case "inputText":
       return [`- inputText: ${plainText(action.text, where)}`];
     case "eraseText":
@@ -151,7 +154,22 @@ function actionLines(action: MobileAction, where: string): string[] {
         ...(action.direction === undefined ? [] : [`    direction: ${action.direction}`]),
       ];
     case "hideKeyboard":
-      return ["- hideKeyboard"];
+      // On Android, Maestro 2.12.1 hides the keyboard with Back, also when no keyboard is open,
+      // and Back then leaves the screen. So the flow hides it only while a keyboard is on the screen.
+      return [
+        "- runFlow:",
+        "  when:",
+        "    platform: Android",
+        "    visible:",
+        `      id: ${quoted(ANDROID_KEYBOARD)}`,
+        "    commands:",
+        "      - hideKeyboard",
+        "- runFlow:",
+        "  when:",
+        "    platform: iOS",
+        "    commands:",
+        "      - hideKeyboard",
+      ];
   }
 }
 
@@ -265,6 +283,15 @@ interface RecordedCommand {
 const ADDED_BY_MAESTRO = new Set(["applyConfigurationCommand", "defineVariablesCommand"]);
 
 /**
+ * Commands that a flow runs only inside a `runFlow`. Maestro records them too, next to
+ * their `runFlow`, when they run. The `runFlow` is the command of the step: a failure
+ * inside it fails the `runFlow` too.
+ */
+const NESTED = new Set(["hideKeyboardCommand"]);
+/** The same commands, as Maestro prints them. */
+const NESTED_LINE = /^\s*Hide keyboard\.\.\. [A-Z]+$/i;
+
+/**
  * Reads what Maestro recorded and names the command that failed.
  * Returns nothing when the record does not have the expected shape: the
  * caller then reports that the flow could not be read, never a guess.
@@ -274,7 +301,7 @@ export function failedCommand(recorded: unknown, commands: readonly FlowCommand[
   const inOrder = [...(recorded as RecordedCommand[])].sort((a, b) => (a.metadata?.sequenceNumber ?? 0) - (b.metadata?.sequenceNumber ?? 0));
   const ours = inOrder.filter((entry) => {
     const kinds = Object.keys(entry.command ?? {});
-    return kinds.length > 0 && !kinds.some((kind) => ADDED_BY_MAESTRO.has(kind));
+    return kinds.length > 0 && !kinds.some((kind) => ADDED_BY_MAESTRO.has(kind) || NESTED.has(kind));
   });
   if (ours.length > commands.length) return undefined;
   const index = ours.findIndex((entry) => entry.metadata?.status === "FAILED");
@@ -300,7 +327,7 @@ export function failedCommandFromOutput(output: string, commands: readonly FlowC
   let index = -1;
   for (const [at, line] of lines.entries()) {
     const status = /\.\.\. ([A-Z]+)$/.exec(line)?.[1];
-    if (status === undefined) continue;
+    if (status === undefined || NESTED_LINE.test(line)) continue;
     index += 1;
     if (status !== "FAILED") continue;
     const command = commands[index];
