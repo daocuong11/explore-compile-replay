@@ -342,7 +342,7 @@ test("the keyboard is hidden inside a runFlow, and what runs inside it shifts no
   const entry = (sequenceNumber: number, kind: string, status: string) => ({ command: { [kind]: {} }, metadata: { status, sequenceNumber } });
   const record = [entry(0, "defineVariablesCommand", "COMPLETED"), entry(1, "applyConfigurationCommand", "COMPLETED")];
   for (let index = 0; index <= failAt; index += 1) {
-    record.push(entry(record.length, index === keyboard || index === keyboard + 1 ? "runFlowCommand" : "tapOnElement", index === failAt ? "FAILED" : "COMPLETED"));
+    record.push(entry(record.length, index === keyboard || index === keyboard + 1 ? "runFlowCommand" : "tapOnElement", index === failAt ? "FAILED" : index === keyboard + 1 ? "SKIPPED" : "COMPLETED"));
     if (index === keyboard) record.push(entry(record.length, "hideKeyboardCommand", "COMPLETED"));
   }
   assert.deepEqual(failedCommand(record, commands), { command: { stepId: "search", oracleId: "counter-singular" } });
