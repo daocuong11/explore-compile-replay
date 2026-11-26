@@ -121,7 +121,18 @@ test("every action of the vocabulary compiles", () => {
       text: "Delete account"
     direction: DOWN
 # Step t10
-- hideKeyboard
+- runFlow:
+    when:
+      platform: Android
+      visible:
+        id: "com\\\\.(google\\\\.)?android\\\\.inputmethod\\\\.latin:id/.*"
+    commands:
+      - hideKeyboard
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - hideKeyboard
 # Step t11
 - tapOn:
     text: "Title"
@@ -235,11 +246,13 @@ test("the flows in device/ are what the compiler gives today", () => {
 test("flowCommands names the step and the oracle of each command, in order", () => {
   const trace = deviceTrace("tiny-todo-one-tasks");
   const commands = flowCommands(compileToMaestro(trace));
-  // One command per step, and after each step its checkpoints then the invariant.
+  // One command per step (two for hideKeyboard: one runFlow per platform),
+  // and after each step its checkpoints then the invariant.
   const expected = trace.steps.flatMap((step) => [
-    { stepId: step.id },
+    ...(step.action.kind === "hideKeyboard" ? [{ stepId: step.id }, { stepId: step.id }] : [{ stepId: step.id }]),
     ...[...step.checkpoints, ...trace.invariants].map((oracle) => ({ stepId: step.id, oracleId: oracle.id })),
   ]);
+  assert.ok(trace.steps.some((step) => step.action.kind === "hideKeyboard"));
   assert.deepEqual(commands, expected);
 });
 
@@ -313,4 +326,47 @@ test("failedCommandFromOutput reads what Maestro 2.12.1 prints on an emulator", 
   });
   assert.equal(failedCommandFromOutput(done(3).join("\n"), commands), undefined);
   assert.equal(failedCommandFromOutput([...done(commands.length), "One more... FAILED"].join("\n"), commands), undefined);
+});
+
+test("the keyboard is hidden inside a runFlow, and what runs inside it shifts no later command", () => {
+  const trace = deviceTrace("tiny-todo-one-tasks");
+  const artifact = compileToMaestro(trace);
+  assert.match(artifact.content, /# Step keyboard[^\n]*\n- runFlow:\n {4}when:\n {6}platform: Android\n {6}visible:\n/);
+  const commands = flowCommands(artifact);
+  const keyboard = commands.findIndex((command) => command.stepId === "keyboard");
+  const failAt = commands.findIndex((command) => command.oracleId === "counter-singular");
+  assert.ok(keyboard > 0 && failAt > keyboard);
+
+  // The record: Maestro adds two commands, then one entry per command of the flow, and one
+  // more for the hideKeyboard that ran inside the runFlow of the Android phone.
+  const entry = (sequenceNumber: number, kind: string, status: string) => ({ command: { [kind]: {} }, metadata: { status, sequenceNumber } });
+  const record = [entry(0, "defineVariablesCommand", "COMPLETED"), entry(1, "applyConfigurationCommand", "COMPLETED")];
+  for (let index = 0; index <= failAt; index += 1) {
+    record.push(entry(record.length, index === keyboard || index === keyboard + 1 ? "runFlowCommand" : "tapOnElement", index === failAt ? "FAILED" : "COMPLETED"));
+    if (index === keyboard) record.push(entry(record.length, "hideKeyboardCommand", "COMPLETED"));
+  }
+  assert.deepEqual(failedCommand(record, commands), { command: { stepId: "search", oracleId: "counter-singular" } });
+
+  // A keyboard that cannot be hidden fails its runFlow too: the step is the one that hides it.
+  const stuck = Array.from({ length: keyboard + 1 }, (_, index) =>
+    entry(index, index === keyboard ? "runFlowCommand" : "tapOnElement", index === keyboard ? "FAILED" : "COMPLETED"),
+  );
+  stuck.push(entry(keyboard + 1, "hideKeyboardCommand", "FAILED"));
+  assert.deepEqual(failedCommand(stuck, commands), { command: { stepId: "keyboard" } });
+
+  // The same in what Maestro prints, where the command inside the runFlow is indented.
+  const output = [
+    ...Array.from({ length: keyboard }, (_, index) => `Command ${index + 1}... COMPLETED`),
+    'Run flow when "com.(google.)?android.inputmethod.latin:id/.*" is visible... COMPLETED',
+    "  Hide Keyboard... COMPLETED",
+    "Run flow when platform is iOS... SKIPPED",
+    ...Array.from({ length: failAt - keyboard - 2 }, (_, index) => `Command ${keyboard + 3 + index}... COMPLETED`),
+    'Assert that "1 task" is visible... FAILED',
+    "",
+    'Assertion is false: "1 task" is visible',
+  ].join("\n");
+  assert.deepEqual(failedCommandFromOutput(output, commands), {
+    command: { stepId: "search", oracleId: "counter-singular" },
+    message: 'Assertion is false: "1 task" is visible',
+  });
 });
