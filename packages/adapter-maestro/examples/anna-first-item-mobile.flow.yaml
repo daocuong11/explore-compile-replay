@@ -48,15 +48,15 @@ name: "anna: Add her first item without help."
     text: "App keeps stopping"
 # Step s7: The keyboard hides the Save button, so she closes it.
 - runFlow:
-  when:
-    platform: Android
-    visible:
-      id: "com\\.(google\\.)?android\\.inputmethod\\.latin:id/.*"
+    when:
+      platform: Android
+      visible:
+        id: "com\\.(google\\.)?android\\.inputmethod\\.latin:id/.*"
     commands:
       - hideKeyboard
 - runFlow:
-  when:
-    platform: iOS
+    when:
+      platform: iOS
     commands:
       - hideKeyboard
 # Oracle no-crash-dialog
