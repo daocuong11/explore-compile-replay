@@ -1,0 +1,28 @@
+# A Tip dialog with an OK button opens before the address dialog.
+diff --git a/app/lib/pages/tabs/send_tab_vm.dart b/app/lib/pages/tabs/send_tab_vm.dart
+index 754fbd7..02b1ebb 100644
+--- a/app/lib/pages/tabs/send_tab_vm.dart
++++ b/app/lib/pages/tabs/send_tab_vm.dart
+@@ -75,6 +75,22 @@ final sendTabVmProvider = ViewProvider((ref) {
+       if (files.isEmpty || !context.mounted) {
+         return;
+       }
++      await showDialog<void>(
++        context: context,
++        builder: (dialogContext) => AlertDialog(
++          title: const Text('Tip'),
++          content: const Text('LocalSend works best on the same Wi-Fi network.'),
++          actions: [
++            TextButton(
++              onPressed: () => Navigator.of(dialogContext).pop(),
++              child: const Text('OK'),
++            ),
++          ],
++        ),
++      );
++      if (!context.mounted) {
++        return;
++      }
+       final device = await showDialog<Device?>(
+         context: context,
+         builder: (_) => const AddressInputDialog(),

@@ -1,0 +1,47 @@
+# The Send and Settings tabs swap places in the navigation.
+diff --git a/app/lib/pages/home_page.dart b/app/lib/pages/home_page.dart
+index 0f3f94e..c8607d1 100644
+--- a/app/lib/pages/home_page.dart
++++ b/app/lib/pages/home_page.dart
+@@ -36,6 +36,8 @@ enum HomeTab {
+   }
+ }
+ 
++const _mutantOrder = [HomeTab.receive, HomeTab.settings, HomeTab.send];
++
+ class HomePage extends StatefulWidget {
+   final HomeTab initialTab;
+ 
+@@ -110,8 +112,8 @@ class _HomePageState extends State<HomePage> with Refena {
+               children: [
+                 if (!sizingInformation.isMobile)
+                   NavigationRail(
+-                    selectedIndex: vm.currentTab.index,
+-                    onDestinationSelected: (index) => vm.changeTab(HomeTab.values[index]),
++                    selectedIndex: _mutantOrder.indexOf(vm.currentTab),
++                    onDestinationSelected: (index) => vm.changeTab(_mutantOrder[index]),
+                     extended: sizingInformation.isDesktop,
+                     backgroundColor: Theme.of(context).cardColorWithElevation,
+                     leading: sizingInformation.isDesktop
+@@ -127,7 +129,7 @@ class _HomePageState extends State<HomePage> with Refena {
+                             ],
+                           )
+                         : null,
+-                    destinations: HomeTab.values.map((tab) {
++                    destinations: _mutantOrder.map((tab) {
+                       return NavigationRailDestination(
+                         icon: Icon(tab.icon),
+                         label: Text(tab.label),
+@@ -171,9 +173,9 @@ class _HomePageState extends State<HomePage> with Refena {
+             ),
+             bottomNavigationBar: sizingInformation.isMobile
+                 ? NavigationBar(
+-                    selectedIndex: vm.currentTab.index,
+-                    onDestinationSelected: (index) => vm.changeTab(HomeTab.values[index]),
+-                    destinations: HomeTab.values.map((tab) {
++                    selectedIndex: _mutantOrder.indexOf(vm.currentTab),
++                    onDestinationSelected: (index) => vm.changeTab(_mutantOrder[index]),
++                    destinations: _mutantOrder.map((tab) {
+                       return NavigationDestination(icon: Icon(tab.icon), label: tab.label);
+                     }).toList(),
+                   )

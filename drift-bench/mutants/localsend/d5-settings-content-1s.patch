@@ -1,0 +1,58 @@
+# The content of the Settings tab appears 1 s after the tab is built.
+diff --git a/app/lib/pages/tabs/settings_tab.dart b/app/lib/pages/tabs/settings_tab.dart
+index d511b7f..96ba5c5 100644
+--- a/app/lib/pages/tabs/settings_tab.dart
++++ b/app/lib/pages/tabs/settings_tab.dart
+@@ -43,7 +43,7 @@ class SettingsTab extends StatelessWidget {
+       provider: (ref) => settingsTabControllerProvider,
+       builder: (context, vm) {
+         final ref = context.ref;
+-        return ResponsiveListView(
++        return MutantLate(delay: const Duration(seconds: 1), child: ResponsiveListView(
+           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 40),
+           children: [
+             Padding(
+@@ -621,7 +621,7 @@ class SettingsTab extends StatelessWidget {
+             ),
+             const SizedBox(height: 80),
+           ],
+-        );
++        ));
+       },
+     );
+   }
+@@ -804,3 +804,34 @@ extension on ColorMode {
+     };
+   }
+ }
++
++
++/// Mutant: shows [child] only after [delay].
++class MutantLate extends StatefulWidget {
++  final Duration delay;
++  final Widget child;
++
++  const MutantLate({required this.delay, required this.child});
++
++  @override
++  State<MutantLate> createState() => _MutantLateState();
++}
++
++class _MutantLateState extends State<MutantLate> {
++  bool _shown = false;
++
++  @override
++  void initState() {
++    super.initState();
++    Future.delayed(widget.delay, () {
++      if (mounted) {
++        setState(() => _shown = true);
++      }
++    });
++  }
++
++  @override
++  Widget build(BuildContext context) {
++    return _shown ? widget.child : const SizedBox.shrink();
++  }
++}

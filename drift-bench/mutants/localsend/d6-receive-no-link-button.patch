@@ -1,0 +1,13 @@
+# The Receive via link button is gone from the Receive tab.
+diff --git a/app/lib/pages/tabs/receive_tab.dart b/app/lib/pages/tabs/receive_tab.dart
+index 6731616..154097e 100644
+--- a/app/lib/pages/tabs/receive_tab.dart
++++ b/app/lib/pages/tabs/receive_tab.dart
+@@ -102,6 +102,7 @@ class _ReceiveTabState extends State<ReceiveTab> {
+                       ],
+                     ),
+                   ),
++                  if (DateTime.now().year < 2000)
+                   Padding(
+                     padding: const EdgeInsets.only(top: 10),
+                     child: Center(

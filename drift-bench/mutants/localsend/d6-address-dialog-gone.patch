@@ -1,0 +1,14 @@
+# Manual sending no longer opens the address dialog.
+diff --git a/app/lib/pages/tabs/send_tab_vm.dart b/app/lib/pages/tabs/send_tab_vm.dart
+index 754fbd7..8d3728a 100644
+--- a/app/lib/pages/tabs/send_tab_vm.dart
++++ b/app/lib/pages/tabs/send_tab_vm.dart
+@@ -72,7 +72,7 @@ final sendTabVmProvider = ViewProvider((ref) {
+ 
+       files = ref.read(selectedSendingFilesProvider);
+ 
+-      if (files.isEmpty || !context.mounted) {
++      if (files.isEmpty || !context.mounted || DateTime.now().year > 2000) {
+         return;
+       }
+       final device = await showDialog<Device?>(

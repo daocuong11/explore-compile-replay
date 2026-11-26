@@ -1,0 +1,28 @@
+# A Tip dialog with an OK button opens once when the app starts.
+diff --git a/app/lib/pages/home_page.dart b/app/lib/pages/home_page.dart
+index 0f3f94e..577e2ae 100644
+--- a/app/lib/pages/home_page.dart
++++ b/app/lib/pages/home_page.dart
+@@ -63,6 +63,22 @@ class _HomePageState extends State<HomePage> with Refena {
+     ensureRef((ref) async {
+       ref.redux(homePageControllerProvider).dispatch(ChangeTabAction(widget.initialTab));
+       await postInit(context, ref, widget.appStart);
++      if (!context.mounted) {
++        return;
++      }
++      await showDialog<void>(
++        context: context,
++        builder: (dialogContext) => AlertDialog(
++          title: const Text('Tip'),
++          content: const Text('LocalSend works best on the same Wi-Fi network.'),
++          actions: [
++            TextButton(
++              onPressed: () => Navigator.of(dialogContext).pop(),
++              child: const Text('OK'),
++            ),
++          ],
++        ),
++      );
+     });
+   }
+ 

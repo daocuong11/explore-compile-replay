@@ -1,0 +1,14 @@
+# The Confirm button of the address dialog ends with ' ›'.
+diff --git a/app/lib/widget/dialogs/address_input_dialog.dart b/app/lib/widget/dialogs/address_input_dialog.dart
+index 831bf74..f3cce61 100644
+--- a/app/lib/widget/dialogs/address_input_dialog.dart
++++ b/app/lib/widget/dialogs/address_input_dialog.dart
+@@ -245,7 +245,7 @@ class _AddressInputDialogState extends State<AddressInputDialog> with Refena {
+         ),
+         FilledButton(
+           onPressed: _fetching ? null : () async => _submit(localIps, settings.port),
+-          child: Text(t.general.confirm),
++          child: Text('${t.general.confirm} ›'),
+         ),
+       ],
+     );

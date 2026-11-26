@@ -1,0 +1,15 @@
+# The Text button no longer opens the message dialog.
+diff --git a/app/lib/util/native/file_picker.dart b/app/lib/util/native/file_picker.dart
+index be37719..320ef43 100644
+--- a/app/lib/util/native/file_picker.dart
++++ b/app/lib/util/native/file_picker.dart
+@@ -283,6 +283,9 @@ Future<void> _pickMedia(BuildContext context, Ref ref) async {
+ }
+ 
+ Future<void> _pickText(BuildContext context, Ref ref) async {
++  if (DateTime.now().year > 2000) {
++    return;
++  }
+   final result = await showDialog<String>(context: context, builder: (_) => const MessageInputDialog());
+   if (result != null) {
+     ref.redux(selectedSendingFilesProvider).dispatch(AddMessageAction(message: result));

@@ -1,0 +1,29 @@
+# The Language row moves above the Theme row in Settings.
+diff --git a/app/lib/pages/tabs/settings_tab.dart b/app/lib/pages/tabs/settings_tab.dart
+index d511b7f..2aab4db 100644
+--- a/app/lib/pages/tabs/settings_tab.dart
++++ b/app/lib/pages/tabs/settings_tab.dart
+@@ -54,6 +54,11 @@ class SettingsTab extends StatelessWidget {
+             _SettingsSection(
+               title: t.settingsTab.general.title,
+               children: [
++                _ButtonEntry(
++                  label: t.settingsTab.general.language,
++                  buttonLabel: vm.settings.locale?.getLocaleName() ?? t.settingsTab.general.languageOptions.system,
++                  onTap: () => vm.onTapLanguage(context),
++                ),
+                 _SettingsEntry(
+                   label: t.settingsTab.general.brightness,
+                   child: CustomDropdownButton<ThemeMode>(
+@@ -82,11 +87,6 @@ class SettingsTab extends StatelessWidget {
+                     onChanged: (colorMode) => vm.onChangeColorMode(context, colorMode),
+                   ),
+                 ),
+-                _ButtonEntry(
+-                  label: t.settingsTab.general.language,
+-                  buttonLabel: vm.settings.locale?.getLocaleName() ?? t.settingsTab.general.languageOptions.system,
+-                  onTap: () => vm.onTapLanguage(context),
+-                ),
+                 if (checkPlatformIsDesktop()) ...[
+                   _BooleanEntry(
+                     label: t.settingsTab.general.alwaysOnTop,

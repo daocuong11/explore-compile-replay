@@ -1,0 +1,24 @@
+# Confirm and Cancel swap places in the address dialog.
+diff --git a/app/lib/widget/dialogs/address_input_dialog.dart b/app/lib/widget/dialogs/address_input_dialog.dart
+index 831bf74..cf2f857 100644
+--- a/app/lib/widget/dialogs/address_input_dialog.dart
++++ b/app/lib/widget/dialogs/address_input_dialog.dart
+@@ -239,14 +239,14 @@ class _AddressInputDialogState extends State<AddressInputDialog> with Refena {
+         ],
+       ),
+       actions: [
+-        TextButton(
+-          onPressed: () => context.pop(),
+-          child: Text(t.general.cancel),
+-        ),
+         FilledButton(
+           onPressed: _fetching ? null : () async => _submit(localIps, settings.port),
+           child: Text(t.general.confirm),
+         ),
++        TextButton(
++          onPressed: () => context.pop(),
++          child: Text(t.general.cancel),
++        ),
+       ],
+     );
+   }

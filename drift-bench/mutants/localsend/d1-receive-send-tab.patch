@@ -1,0 +1,14 @@
+# The label of the Send tab ends with ' ›'.
+diff --git a/app/lib/pages/home_page.dart b/app/lib/pages/home_page.dart
+index 0f3f94e..3a75fd4 100644
+--- a/app/lib/pages/home_page.dart
++++ b/app/lib/pages/home_page.dart
+@@ -29,7 +29,7 @@ enum HomeTab {
+       case HomeTab.receive:
+         return t.receiveTab.title;
+       case HomeTab.send:
+-        return t.sendTab.title;
++        return '${t.sendTab.title} ›';
+       case HomeTab.settings:
+         return t.settingsTab.title;
+     }

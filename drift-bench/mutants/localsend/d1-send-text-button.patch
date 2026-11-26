@@ -1,0 +1,14 @@
+# The Text button of the Send tab is labelled 'Text ›'.
+diff --git a/app/lib/util/native/file_picker.dart b/app/lib/util/native/file_picker.dart
+index be37719..a2cc4f6 100644
+--- a/app/lib/util/native/file_picker.dart
++++ b/app/lib/util/native/file_picker.dart
+@@ -56,7 +56,7 @@ enum FilePickerOption {
+       case FilePickerOption.media:
+         return t.sendTab.picker.media;
+       case FilePickerOption.text:
+-        return t.sendTab.picker.text;
++        return '${t.sendTab.picker.text} ›';
+       case FilePickerOption.app:
+         return t.sendTab.picker.app;
+       case FilePickerOption.clipboard:

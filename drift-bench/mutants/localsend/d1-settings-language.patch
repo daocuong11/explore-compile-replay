@@ -1,0 +1,14 @@
+# The value of the Language row in Settings ends with ' ›'.
+diff --git a/app/lib/pages/tabs/settings_tab.dart b/app/lib/pages/tabs/settings_tab.dart
+index d511b7f..51779c2 100644
+--- a/app/lib/pages/tabs/settings_tab.dart
++++ b/app/lib/pages/tabs/settings_tab.dart
+@@ -84,7 +84,7 @@ class SettingsTab extends StatelessWidget {
+                 ),
+                 _ButtonEntry(
+                   label: t.settingsTab.general.language,
+-                  buttonLabel: vm.settings.locale?.getLocaleName() ?? t.settingsTab.general.languageOptions.system,
++                  buttonLabel: '${vm.settings.locale?.getLocaleName() ?? t.settingsTab.general.languageOptions.system} ›',
+                   onTap: () => vm.onTapLanguage(context),
+                 ),
+                 if (checkPlatformIsDesktop()) ...[

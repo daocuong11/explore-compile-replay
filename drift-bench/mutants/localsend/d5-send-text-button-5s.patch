@@ -1,0 +1,58 @@
+# The picker buttons of the Send tab, with Text, appear 5 s after the tab is built.
+diff --git a/app/lib/pages/tabs/send_tab.dart b/app/lib/pages/tabs/send_tab.dart
+index 3fd71cd..bf916cf 100644
+--- a/app/lib/pages/tabs/send_tab.dart
++++ b/app/lib/pages/tabs/send_tab.dart
+@@ -68,7 +68,7 @@ class SendTab extends StatelessWidget {
+                 childPadding: 10,
+                 minChildWidth: buttonWidth,
+                 children: pickerOptions.map((option) {
+-                  return BigButton(
++                  return MutantLate(delay: const Duration(seconds: 5), child: BigButton(
+                     icon: option.icon,
+                     label: option.label,
+                     filled: false,
+@@ -78,7 +78,7 @@ class SendTab extends StatelessWidget {
+                         context: context,
+                       ),
+                     ),
+-                  );
++                  ));
+                 }).toList(),
+               ),
+             ] else ...[
+@@ -584,3 +584,34 @@ extension on SessionStatus {
+     }
+   }
+ }
++
++
++/// Mutant: shows [child] only after [delay].
++class MutantLate extends StatefulWidget {
++  final Duration delay;
++  final Widget child;
++
++  const MutantLate({required this.delay, required this.child});
++
++  @override
++  State<MutantLate> createState() => _MutantLateState();
++}
++
++class _MutantLateState extends State<MutantLate> {
++  bool _shown = false;
++
++  @override
++  void initState() {
++    super.initState();
++    Future.delayed(widget.delay, () {
++      if (mounted) {
++        setState(() => _shown = true);
++      }
++    });
++  }
++
++  @override
++  Widget build(BuildContext context) {
++    return _shown ? widget.child : const SizedBox.shrink();
++  }
++}

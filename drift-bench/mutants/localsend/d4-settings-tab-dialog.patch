@@ -1,0 +1,51 @@
+# A Tip dialog with an OK button opens the first time the Settings tab is selected.
+diff --git a/app/lib/pages/home_page.dart b/app/lib/pages/home_page.dart
+index 0f3f94e..147c730 100644
+--- a/app/lib/pages/home_page.dart
++++ b/app/lib/pages/home_page.dart
+@@ -56,6 +56,27 @@ class HomePage extends StatefulWidget {
+ class _HomePageState extends State<HomePage> with Refena {
+   bool _dragAndDropIndicator = false;
+ 
++  final Set<HomeTab> _mutantTipShown = {};
++
++  Future<void> _mutantSelect(HomePageVm vm, HomeTab tab) async {
++    vm.changeTab(tab);
++    if (tab == HomeTab.settings && _mutantTipShown.add(tab)) {
++      await showDialog<void>(
++        context: context,
++        builder: (dialogContext) => AlertDialog(
++          title: const Text('Tip'),
++          content: const Text('LocalSend works best on the same Wi-Fi network.'),
++          actions: [
++            TextButton(
++              onPressed: () => Navigator.of(dialogContext).pop(),
++              child: const Text('OK'),
++            ),
++          ],
++        ),
++      );
++    }
++  }
++
+   @override
+   void initState() {
+     super.initState();
+@@ -111,7 +132,7 @@ class _HomePageState extends State<HomePage> with Refena {
+                 if (!sizingInformation.isMobile)
+                   NavigationRail(
+                     selectedIndex: vm.currentTab.index,
+-                    onDestinationSelected: (index) => vm.changeTab(HomeTab.values[index]),
++                    onDestinationSelected: (index) async => _mutantSelect(vm, HomeTab.values[index]),
+                     extended: sizingInformation.isDesktop,
+                     backgroundColor: Theme.of(context).cardColorWithElevation,
+                     leading: sizingInformation.isDesktop
+@@ -172,7 +193,7 @@ class _HomePageState extends State<HomePage> with Refena {
+             bottomNavigationBar: sizingInformation.isMobile
+                 ? NavigationBar(
+                     selectedIndex: vm.currentTab.index,
+-                    onDestinationSelected: (index) => vm.changeTab(HomeTab.values[index]),
++                    onDestinationSelected: (index) async => _mutantSelect(vm, HomeTab.values[index]),
+                     destinations: HomeTab.values.map((tab) {
+                       return NavigationDestination(icon: Icon(tab.icon), label: tab.label);
+                     }).toList(),

@@ -1,0 +1,16 @@
+# On Android the Text button moves to the end of the picker buttons.
+diff --git a/app/lib/util/native/file_picker.dart b/app/lib/util/native/file_picker.dart
+index be37719..7c91fac 100644
+--- a/app/lib/util/native/file_picker.dart
++++ b/app/lib/util/native/file_picker.dart
+@@ -83,9 +83,9 @@ enum FilePickerOption {
+         FilePickerOption.file,
+         FilePickerOption.media,
+         FilePickerOption.clipboard,
+-        FilePickerOption.text,
+         FilePickerOption.folder,
+         FilePickerOption.app,
++        FilePickerOption.text,
+       ];
+     } else {
+       // Desktop

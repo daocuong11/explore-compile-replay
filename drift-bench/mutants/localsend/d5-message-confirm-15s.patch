@@ -1,0 +1,54 @@
+# The Confirm button of the message dialog appears 15 s after the dialog.
+diff --git a/app/lib/widget/dialogs/message_input_dialog.dart b/app/lib/widget/dialogs/message_input_dialog.dart
+index 6da29b0..30cb4f4 100644
+--- a/app/lib/widget/dialogs/message_input_dialog.dart
++++ b/app/lib/widget/dialogs/message_input_dialog.dart
+@@ -42,15 +42,46 @@ class _MessageInputDialogState extends State<MessageInputDialog> {
+           onPressed: () => context.pop(),
+           child: Text(t.general.cancel),
+         ),
+-        ElevatedButton(
++        MutantLate(delay: const Duration(seconds: 15), child: ElevatedButton(
+           style: ElevatedButton.styleFrom(
+             backgroundColor: Theme.of(context).colorScheme.primary,
+             foregroundColor: Theme.of(context).colorScheme.onPrimary,
+           ),
+           onPressed: () => context.pop(_textController.text),
+           child: Text(t.general.confirm),
+-        ),
++        )),
+       ],
+     );
+   }
+ }
++
++
++/// Mutant: shows [child] only after [delay].
++class MutantLate extends StatefulWidget {
++  final Duration delay;
++  final Widget child;
++
++  const MutantLate({required this.delay, required this.child});
++
++  @override
++  State<MutantLate> createState() => _MutantLateState();
++}
++
++class _MutantLateState extends State<MutantLate> {
++  bool _shown = false;
++
++  @override
++  void initState() {
++    super.initState();
++    Future.delayed(widget.delay, () {
++      if (mounted) {
++        setState(() => _shown = true);
++      }
++    });
++  }
++
++  @override
++  Widget build(BuildContext context) {
++    return _shown ? widget.child : const SizedBox.shrink();
++  }
++}

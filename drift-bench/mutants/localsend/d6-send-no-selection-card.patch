@@ -1,0 +1,14 @@
+# The Send tab never shows the selection card, even when something is selected.
+diff --git a/app/lib/pages/tabs/send_tab.dart b/app/lib/pages/tabs/send_tab.dart
+index 3fd71cd..4eb26bc 100644
+--- a/app/lib/pages/tabs/send_tab.dart
++++ b/app/lib/pages/tabs/send_tab.dart
+@@ -81,7 +81,7 @@ class SendTab extends StatelessWidget {
+                   );
+                 }).toList(),
+               ),
+-            ] else ...[
++            ] else if (DateTime.now().year < 2000) ...[
+               Card(
+                 margin: const EdgeInsets.only(bottom: 10, left: _horizontalPadding, right: _horizontalPadding),
+                 child: Padding(

@@ -1,0 +1,31 @@
+# Selecting the Settings tab no longer changes the tab.
+diff --git a/app/lib/pages/home_page.dart b/app/lib/pages/home_page.dart
+index 0f3f94e..5f824c8 100644
+--- a/app/lib/pages/home_page.dart
++++ b/app/lib/pages/home_page.dart
+@@ -111,7 +111,11 @@ class _HomePageState extends State<HomePage> with Refena {
+                 if (!sizingInformation.isMobile)
+                   NavigationRail(
+                     selectedIndex: vm.currentTab.index,
+-                    onDestinationSelected: (index) => vm.changeTab(HomeTab.values[index]),
++                    onDestinationSelected: (index) {
++                      if (HomeTab.values[index] != HomeTab.settings) {
++                        vm.changeTab(HomeTab.values[index]);
++                      }
++                    },
+                     extended: sizingInformation.isDesktop,
+                     backgroundColor: Theme.of(context).cardColorWithElevation,
+                     leading: sizingInformation.isDesktop
+@@ -172,7 +176,11 @@ class _HomePageState extends State<HomePage> with Refena {
+             bottomNavigationBar: sizingInformation.isMobile
+                 ? NavigationBar(
+                     selectedIndex: vm.currentTab.index,
+-                    onDestinationSelected: (index) => vm.changeTab(HomeTab.values[index]),
++                    onDestinationSelected: (index) {
++                      if (HomeTab.values[index] != HomeTab.settings) {
++                        vm.changeTab(HomeTab.values[index]);
++                      }
++                    },
+                     destinations: HomeTab.values.map((tab) {
+                       return NavigationDestination(icon: Icon(tab.icon), label: tab.label);
+                     }).toList(),

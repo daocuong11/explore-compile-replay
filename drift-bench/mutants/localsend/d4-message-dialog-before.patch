@@ -1,0 +1,28 @@
+# A Tip dialog with an OK button opens before the message dialog.
+diff --git a/app/lib/util/native/file_picker.dart b/app/lib/util/native/file_picker.dart
+index be37719..5b9445e 100644
+--- a/app/lib/util/native/file_picker.dart
++++ b/app/lib/util/native/file_picker.dart
+@@ -283,6 +283,22 @@ Future<void> _pickMedia(BuildContext context, Ref ref) async {
+ }
+ 
+ Future<void> _pickText(BuildContext context, Ref ref) async {
++  await showDialog<void>(
++    context: context,
++    builder: (dialogContext) => AlertDialog(
++      title: const Text('Tip'),
++      content: const Text('LocalSend works best on the same Wi-Fi network.'),
++      actions: [
++    TextButton(
++      onPressed: () => Navigator.of(dialogContext).pop(),
++      child: const Text('OK'),
++    ),
++      ],
++    ),
++  );
++  if (!context.mounted) {
++    return;
++  }
+   final result = await showDialog<String>(context: context, builder: (_) => const MessageInputDialog());
+   if (result != null) {
+     ref.redux(selectedSendingFilesProvider).dispatch(AddMessageAction(message: result));

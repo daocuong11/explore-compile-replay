@@ -1,0 +1,74 @@
+# The navigation, with the Send tab, appears 1 s after the home page.
+diff --git a/app/lib/pages/home_page.dart b/app/lib/pages/home_page.dart
+index 0f3f94e..51f183e 100644
+--- a/app/lib/pages/home_page.dart
++++ b/app/lib/pages/home_page.dart
+@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> with Refena {
+             body: Row(
+               children: [
+                 if (!sizingInformation.isMobile)
+-                  NavigationRail(
++                  MutantLate(delay: const Duration(seconds: 1), child: NavigationRail(
+                     selectedIndex: vm.currentTab.index,
+                     onDestinationSelected: (index) => vm.changeTab(HomeTab.values[index]),
+                     extended: sizingInformation.isDesktop,
+@@ -133,7 +133,7 @@ class _HomePageState extends State<HomePage> with Refena {
+                         label: Text(tab.label),
+                       );
+                     }).toList(),
+-                  ),
++                  )),
+                 Expanded(
+                   child: SafeArea(
+                     left: sizingInformation.isMobile,
+@@ -170,13 +170,13 @@ class _HomePageState extends State<HomePage> with Refena {
+               ],
+             ),
+             bottomNavigationBar: sizingInformation.isMobile
+-                ? NavigationBar(
++                ? MutantLate(delay: const Duration(seconds: 1), child: NavigationBar(
+                     selectedIndex: vm.currentTab.index,
+                     onDestinationSelected: (index) => vm.changeTab(HomeTab.values[index]),
+                     destinations: HomeTab.values.map((tab) {
+                       return NavigationDestination(icon: Icon(tab.icon), label: tab.label);
+                     }).toList(),
+-                  )
++                  ))
+                 : null,
+           );
+         },
+@@ -184,3 +184,34 @@ class _HomePageState extends State<HomePage> with Refena {
+     );
+   }
+ }
++
++
++/// Mutant: shows [child] only after [delay].
++class MutantLate extends StatefulWidget {
++  final Duration delay;
++  final Widget child;
++
++  const MutantLate({required this.delay, required this.child});
++
++  @override
++  State<MutantLate> createState() => _MutantLateState();
++}
++
++class _MutantLateState extends State<MutantLate> {
++  bool _shown = false;
++
++  @override
++  void initState() {
++    super.initState();
++    Future.delayed(widget.delay, () {
++      if (mounted) {
++        setState(() => _shown = true);
++      }
++    });
++  }
++
++  @override
++  Widget build(BuildContext context) {
++    return _shown ? widget.child : const SizedBox.shrink();
++  }
++}
