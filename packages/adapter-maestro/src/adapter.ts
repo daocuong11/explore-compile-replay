@@ -158,15 +158,15 @@ function actionLines(action: MobileAction, where: string): string[] {
       // and Back then leaves the screen. So the flow hides it only while a keyboard is on the screen.
       return [
         "- runFlow:",
-        "  when:",
-        "    platform: Android",
-        "    visible:",
-        `      id: ${quoted(ANDROID_KEYBOARD)}`,
+        "    when:",
+        "      platform: Android",
+        "      visible:",
+        `        id: ${quoted(ANDROID_KEYBOARD)}`,
         "    commands:",
         "      - hideKeyboard",
         "- runFlow:",
-        "  when:",
-        "    platform: iOS",
+        "    when:",
+        "      platform: iOS",
         "    commands:",
         "      - hideKeyboard",
       ];
