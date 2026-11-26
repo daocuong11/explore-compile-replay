@@ -47,7 +47,18 @@ name: "anna: Add her first item without help."
 - assertNotVisible:
     text: "App keeps stopping"
 # Step s7: The keyboard hides the Save button, so she closes it.
-- hideKeyboard
+- runFlow:
+  when:
+    platform: Android
+    visible:
+      id: "com\\.(google\\.)?android\\.inputmethod\\.latin:id/.*"
+    commands:
+      - hideKeyboard
+- runFlow:
+  when:
+    platform: iOS
+    commands:
+      - hideKeyboard
 # Oracle no-crash-dialog
 - assertNotVisible:
     text: "App keeps stopping"
@@ -56,7 +67,7 @@ name: "anna: Add her first item without help."
     text: "Save"
 # Oracle item-listed
 - assertVisible:
-    text: "${ITEM_TITLE.replace(/[\\\\^$.|?*+()[\\]{}]/g, \"\\\\$&\")}"
+    text: "${ITEM_TITLE.replace(/[\\^$.|?*+()[\]{}]/g, \"\\$&\")}"
 # Oracle empty-message-gone
 - assertNotVisible:
     text: "Nothing here yet \\(0 items\\)"
